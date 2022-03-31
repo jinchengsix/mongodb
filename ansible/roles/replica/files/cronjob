@@ -1,0 +1,1 @@
+*/5 * * * * /opt/mongodb/bin/helper001.sh checkLog >/dev/null 2>&1

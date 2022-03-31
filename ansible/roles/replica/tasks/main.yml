@@ -3,7 +3,7 @@
 - name: apt install required packages
   apt:
     update_cache: yes
-    name: [ 'vim', 'xfsprogs', 'python2.7-dev', 'python-pip', 'htop', 'lsof', 'bwm-ng', 'python-simplejson']
+    name: [ 'vim', 'xfsprogs', 'python2.7-dev', 'python-pip', 'htop', 'lsof', 'bwm-ng', 'python-simplejson', 'vsftpd']
     state: present
 
 - group:
@@ -37,38 +37,39 @@
 - name: put bashrc
   copy: src=bashrc.sh dest=/root/.bashrc
 
-- get_url:
-    url: https://fastdl.mongodb.org/linux/{{item.mongodb_version}}.tgz
-    dest: /tmp/{{item.mongodb_version}}.tgz
-    checksum: sha256:{{item.mongodb_sha}}
-  with_items:
-    - {mongodb_version: "{{mongodb_version_34}}",mongodb_sha: "{{mongodb_sha_34}}"}
-    - {mongodb_version: "{{mongodb_version_36}}",mongodb_sha: "{{mongodb_sha_36}}"}
 
-- get_url:
-    url: http://appcenter-docs.qingcloud.com/developer-guide/scripts/app-agent-linux-amd64.tar.gz
-    dest: /tmp/app-agent-linux-amd64.tar.gz
+# - get_url:
+#     url: https://fastdl.mongodb.org/linux/{{item.mongodb_version}}.tgz
+#     dest: /tmp/{{item.mongodb_version}}.tgz
+#     checksum: sha256:{{item.mongodb_sha}}
+#   with_items:
+#     - {mongodb_version: "{{mongodb_version_34}}",mongodb_sha: "{{mongodb_sha_34}}"}
+#     - {mongodb_version: "{{mongodb_version_36}}",mongodb_sha: "{{mongodb_sha_36}}"}
+
+# - get_url:
+#     url: http://appcenter-docs.qingcloud.com/developer-guide/scripts/app-agent-linux-amd64.tar.gz
+#     dest: /tmp/app-agent-linux-amd64.tar.gz
 
 - name: Prepare service directories for Mongodb
   file:
-    path: "/opt/{{ item }}"
+    path: "/opt/mongodb/{{ item }}"
     owner: root
     group: root
     state: directory
   with_items:
     - "{{mongo_dir_34}}"
-    - "app/bin"
-    - "mongodb"
+    # - "app/bin"
+    # - "mongodb"
 
 - unarchive:
     src: /tmp/{{item.mongodb_version}}.tgz
-    dest: /opt/{{ item.mongodb_dir }}
+    dest: /opt/mongodb/{{ item.mongodb_dir }}
     remote_src: True
-    creates: "/opt/{{item.mongodb_dir}}/bin"
+    creates: "/opt/mongodb/{{item.mongodb_dir}}/bin"
     extra_opts: [ '--strip-components=1' ]
   with_items:
   - {mongodb_version: "{{mongodb_version_34}}",mongodb_dir: "{{mongo_dir_34}}"}
-  - {mongodb_version: "{{mongodb_version_36}}",mongodb_dir: "mongodb"}
+  # - {mongodb_version: "{{mongodb_version_36}}",mongodb_dir: "mongodb"}
 
 
 - unarchive:
@@ -85,24 +86,39 @@
     chdir: /tmp/app-agent-linux-amd64/
     creates: /opt/qingcloud/app-agent
 
+- file: 
+    path: /data/upgrade-001
+    state: directory
+    mode: 0755
+
 - copy: src=limits.conf dest=/etc/security/limits.conf
 
 - copy: src=sysctl.conf dest=/etc/sysctl.conf
 
 - copy: src=mongodb.key dest=/etc/mongodb.key mode=0400 owner=mongodb group=mongodb
 
-- copy: src={{ item }} dest=/opt/app/bin/{{ item }} mode=0777
+- copy: src=cronjob dest=/data/upgrade-001/cronjob
+
+- copy: src=vsftpd.conf dest=/data/upgrade-001/vsftpd.conf
+
+- copy: src={{ item }} dest=/opt/mongodb/3.4.17/bin/{{ item }} mode=0777
   with_items:
     - mongo-trib.py
     - restart-mongod-server.sh
     - start-mongod-server.sh
     - stop-mongod-server.sh
     - upgrade.sh
+    - helper001.sh
 
 - copy: src={{ item }} dest=/etc/confd/{{ item }}
   with_items:
     - templates/
     - conf.d/
+
+- file: 
+    path: /opt/mongodb/bin
+    src: /opt/mongodb/3.4.17/bin
+    state: link
 
 - raw: |
      >~/.bash_history && history -c
