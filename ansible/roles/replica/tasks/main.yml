@@ -58,7 +58,7 @@
     state: directory
   with_items:
     - "{{mongo_dir_34}}"
-    # - "app/bin"
+    - "app/bin"
     # - "mongodb"
 
 - unarchive:
@@ -78,18 +78,13 @@
     remote_src: True
     creates:
 
-
-- shell: /tmp/app-agent-linux-amd64/install.sh
+- name: install app-agent
+  shell: /tmp/app-agent-linux-amd64/install.sh
   become: true
   become_user: root
   args:
     chdir: /tmp/app-agent-linux-amd64/
     creates: /opt/qingcloud/app-agent
-
-- file: 
-    path: /data/upgrade-001
-    state: directory
-    mode: 0755
 
 - copy: src=limits.conf dest=/etc/security/limits.conf
 
@@ -97,9 +92,9 @@
 
 - copy: src=mongodb.key dest=/etc/mongodb.key mode=0400 owner=mongodb group=mongodb
 
-- copy: src=cronjob dest=/data/upgrade-001/cronjob
+- copy: src=cronjob dest=/etc/cronjob
 
-- copy: src=vsftpd.conf dest=/data/upgrade-001/vsftpd.conf
+- copy: src=vsftpd.conf dest=/etc/vsftpd.conf
 
 - copy: src={{ item }} dest=/opt/mongodb/3.4.17/bin/{{ item }} mode=0777
   with_items:
@@ -122,4 +117,3 @@
 
 - raw: |
      >~/.bash_history && history -c
-

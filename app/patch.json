@@ -2,22 +2,22 @@
     "patch_policy": [""],
     "patch_nodes": [{
         "container": {
-            "snapshot": "ss-epbgrs13",
-            "zone": "pek3a"
+            "snapshot": "ss-8qgu9oel",
+            "zone": "pek3"
         },
         "patch": [{
             "mount_role": "replica",
             "mount_point": "/upgrade",
             "mount_options": "defaults,noatime",
             "filesystem": "ext4",
-            "cmd": "/upgrade/opt/mongodb/bin/upgrade.sh"
+            "cmd": "/upgrade/opt/mongodb/3.4.17/bin/upgrade.sh"
         }],
         "rollback": [{
             "mount_role": "replica",
             "mount_point": "/upgrade",
             "mount_options": "defaults,noatime",
             "filesystem": "ext4",
-            "cmd": "/upgrade/opt/mongodb/bin/upgrade.sh rollback"
+            "cmd": "/upgrade/opt/mongodb/3.4.17/bin/upgrade.sh rollback"
         }]
     }]
 }

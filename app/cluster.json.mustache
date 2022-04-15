@@ -9,7 +9,7 @@
    "upgrade_policy": [
       "appv-xhnpehuq"
    ],
-   "upgrading_policy": "in-place-sequential",
+   "upgrading_policy": "in-place-parallel",
    "in-place-upgrade-nodes": [{
      "container":{
        "snapshot": "ss-epbgrs13",
@@ -28,7 +28,7 @@
          "container":{
             "type":"kvm",
             "zone":"pek3",
-            "image":"img-i2o7whhf"
+            "image":"img-av1zw8of"
          },
          "instance_class":{{cluster.replica.instance_class}},
          "count":{{cluster.replica.count}},
@@ -52,7 +52,7 @@
                "cmd":"/opt/mongodb/bin/mongo-trib.py init;"
             },
             "start":{
-               "cmd":"mkdir -p /data/mongodb; /opt/mongodb/bin/start-mongod-server.sh; /opt/mongodb/bin/helper001.sh logService "
+               "cmd":"mkdir -p /data/mongodb; /opt/mongodb/bin/start-mongod-server.sh;"
             },
             "stop":{
                "cmd":"/opt/mongodb/bin/stop-mongod-server.sh"

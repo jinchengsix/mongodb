@@ -109,7 +109,7 @@ main() {
     log "waiting mongodb to be ready ..."
     retry 1200 3 0 checkFullyStarted
   fi
-
+  
   toggleHealthCheck true
 }
 
